@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.boycottpro.models.Companies;
+import com.boycottpro.utilities.CompanyUtility;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -39,7 +40,7 @@ public class GetAllCompaniesHandler implements RequestHandler<Map<String, Object
 
             // Convert AttributeValue map to Map<String, Object>
             List<Companies> companies = scanResponse.items().stream()
-                    .map(this::mapToCompany)
+                    .map(rec -> CompanyUtility.mapToCompany(rec))
                     .collect(Collectors.toList());
 
             // Serialize to JSON
@@ -60,7 +61,7 @@ public class GetAllCompaniesHandler implements RequestHandler<Map<String, Object
         }
     }
 
-    private Companies mapToCompany(Map<String, AttributeValue> item) {
+    /*private Companies mapToCompany(Map<String, AttributeValue> item) {
         Companies company = new Companies();
         company.setCompany_id(item.get("company_id").s());
         company.setCompany_name(item.get("company_name").s());
@@ -77,5 +78,5 @@ public class GetAllCompaniesHandler implements RequestHandler<Map<String, Object
         company.setCeo(item.getOrDefault("ceo", AttributeValue.fromS("")).s());
         company.setBoycott_count(Integer.parseInt(item.getOrDefault("boycott_count", AttributeValue.fromN("0")).n()));
         return company;
-    }
+    }*/
 }
