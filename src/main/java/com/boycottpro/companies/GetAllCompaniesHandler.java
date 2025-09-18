@@ -42,7 +42,7 @@ public class GetAllCompaniesHandler implements RequestHandler<APIGatewayProxyReq
                     .tableName(TABLE_NAME)
                     .build();
             ScanResponse scanResponse = dynamoDb.scan(scanRequest);
-
+            System.out.println("user is authorized");
             // Convert AttributeValue map to Map<String, Object>
             List<Companies> companies = scanResponse.items().stream()
                     .map(rec -> CompanyUtility.mapToCompany(rec))
