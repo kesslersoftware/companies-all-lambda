@@ -10,6 +10,11 @@ pipeline {
     }
     
     parameters {
+        choice(
+            name: 'ENV',
+            choices: ['dev', 'qa', 'ps', 'prod'],
+            description: 'Target environment for Lambda deployment'
+        )
         booleanParam(
             name: 'SKIP_TESTS',
             defaultValue: false,
@@ -19,6 +24,7 @@ pipeline {
 
     environment {
         LAMBDA_NAME = "${env.JOB_NAME.replace('-pipeline', '')}"
+        ENV = "${params.ENV}"
     }
     
     stages {
@@ -39,6 +45,7 @@ pipeline {
                     env.ARTIFACT_VERSION = "${env.GIT_COMMIT_SHORT}-${env.BUILD_NUMBER}-${env.BUILD_TIMESTAMP}"
 
                     echo "📝 Version components:"
+                    echo "   Environment: ${ENV}"
                     echo "   Git commit: ${env.GIT_COMMIT_SHORT}"
                     echo "   Build number: ${env.BUILD_NUMBER}"
                     echo "   Timestamp: ${env.BUILD_TIMESTAMP}"
@@ -46,6 +53,7 @@ pipeline {
                 }
             }
         }
+
         
         stage('Test') {
             when {
@@ -55,7 +63,7 @@ pipeline {
                 sh '''
                     export JAVA_HOME="${TOOL_JDK_21}"
                     export PATH="$JAVA_HOME/bin:$PATH"
-                    mvn clean test
+                    mvn clean test -P${ENV}
                 '''
             }
             post {
@@ -167,7 +175,7 @@ pipeline {
                 sh '''
                     export JAVA_HOME="${TOOL_JDK_21}"
                     export PATH="$JAVA_HOME/bin:$PATH"
-                    mvn clean package shade:shade -DskipTests -s custom-settings.xml
+                    mvn clean package shade:shade -DskipTests -P${ENV} -s custom-settings.xml
 
                     # Verify the shaded JAR was created (this is the deployable Lambda JAR)
                     if [ ! -f target/${LAMBDA_NAME}.jar ]; then

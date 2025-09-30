@@ -11,10 +11,12 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>    <jacoco.version>0.8.10</jacoco.version>
-    <sonar.organization>kesslersoftware</sonar.organization>
-    <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jacoco.version>0.8.10</jacoco.version>
+        <sonar.organization>kesslersoftware</sonar.organization>
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
     </properties>
+
     <dependencies>
         <!-- AWS Lambda -->
         <dependency>
@@ -72,7 +74,7 @@
         <dependency>
             <groupId>com.boycottpro</groupId>
             <artifactId>boycottpro-common-models</artifactId>
-            <version>LATEST</version>
+            <version>${common-models.version}</version>
         </dependency>
     </dependencies>
     <repositories>
@@ -105,4 +107,33 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <common-models.version>LATEST-dev</common-models.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>qa</id>
+            <properties>
+                <common-models.version>LATEST-qa</common-models.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>ps</id>
+            <properties>
+                <common-models.version>LATEST-ps</common-models.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <common-models.version>LATEST-prod</common-models.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>
