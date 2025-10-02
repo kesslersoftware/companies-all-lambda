@@ -7,6 +7,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.boycottpro.models.Companies;
 import com.boycottpro.utilities.CompanyUtility;
 import com.boycottpro.utilities.JwtUtility;
+import com.boycottpro.utilities.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -34,22 +35,28 @@ public class GetAllCompaniesHandler implements RequestHandler<APIGatewayProxyReq
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
         String sub = null;
+        int lineNum = 38;
         try {
             sub = JwtUtility.getSubFromRestEvent(event);
-            if (sub == null) return response(401, Map.of("message", "Unauthorized"));
+            if (sub == null) {
+            Logger.error(41, sub, "user is Unauthorized");
+            return response(401, Map.of("message", "Unauthorized"));
+            }
+            lineNum = 44;
             // Scan companies table
             ScanRequest scanRequest = ScanRequest.builder()
                     .tableName(TABLE_NAME)
                     .build();
+            lineNum = 50;
             ScanResponse scanResponse = dynamoDb.scan(scanRequest);
-            System.out.println("user is authorized");
             // Convert AttributeValue map to Map<String, Object>
             List<Companies> companies = scanResponse.items().stream()
                     .map(rec -> CompanyUtility.mapToCompany(rec))
                     .collect(Collectors.toList());
+            lineNum = 56;
             return response(200,companies);
         } catch (Exception e) {
-            System.out.println(e.getMessage() + " for user " + sub);
+            Logger.error(lineNum, sub, e.getMessage());
             return response(500,Map.of("error", "Unexpected server error: " + e.getMessage()) );
         }
     }
